@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Новая тема - {{ forum.название }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.forum', forum_id=forum.ID_форума) }}">{{ forum.название }}</a></li>
+        <li class="breadcrumb-item active">Новая тема</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Создать новую тему</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Форум: {{ forum.название }}</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.create_topic', forum_id=forum.ID_форума) }}" method="post">
+            <input type="hidden" name="forum_id" value="{{ forum.ID_форума }}">
+            <div class="mb-3">
+                <label for="name" class="form-label">Название темы</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Создать тему</button>
+                <a href="{{ url_for('main.forum', forum_id=forum.ID_форума) }}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

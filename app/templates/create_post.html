@@ -20,6 +20,8 @@
     </div>
     <div class="card-body">
         <form action="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" method="post">
+            <input type="hidden" name="topic_id" value="{{ topic.ID_темы }}">
+            <input type="hidden" name="user_id" value="{{ DEFAULT_USER_ID }}">
             <div class="mb-3">
                 <label for="content" class="form-label">Содержимое поста</label>
                 <textarea class="form-control" id="content" name="content" rows="8" required></textarea>

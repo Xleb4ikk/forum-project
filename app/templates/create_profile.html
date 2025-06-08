@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Создать профиль{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
+        <li class="breadcrumb-item active">Создать профиль</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Создать профиль пользователя</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('main.create_profile') }}" method="post">
+            <div class="mb-3">
+                <label for="user_id" class="form-label">Пользователь</label>
+                <select class="form-select" id="user_id" name="user_id" required>
+                    <option value="">Выберите пользователя</option>
+                    {% for user in users %}
+                    <option value="{{ user.ID_пользователя }}">{{ user.имя_пользователя }} ({{ user.электронная_почта }}) - ID: {{ user.ID_пользователя }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Статус</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="Активен">Активен</option>
+                    <option value="Заблокирован">Заблокирован</option>
+                    <option value="Новый">Новый</option>
+                </select>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Создать профиль</button>
+                <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

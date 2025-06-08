@@ -35,6 +35,7 @@
     </div>
     <div class="card-body">
         <form action="{{ url_for('main.rate_post', post_id=post.ID_поста) }}" method="post">
+            <input type="hidden" name="post_id" value="{{ post.ID_поста }}">
             <div class="mb-3">
                 <label for="rating" class="form-label">Оценка (1-5)</label>
                 <select class="form-select" id="rating" name="rating" required>
@@ -82,6 +83,8 @@
     </div>
     <div class="card-body">
         <form action="{{ url_for('main.create_comment', post_id=post.ID_поста) }}" method="post">
+            <input type="hidden" name="post_id" value="{{ post.ID_поста }}">
+            <input type="hidden" name="user_id" value="{{ DEFAULT_USER_ID }}">
             <div class="mb-3">
                 <label for="content" class="form-label">Текст комментария</label>
                 <textarea class="form-control" id="content" name="content" rows="3" required></textarea>

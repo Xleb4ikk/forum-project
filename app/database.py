@@ -1,5 +1,6 @@
 from app.models.db_models import db, User, Forum, Topic, Post, Rating, Comment, Category, Profile
 from sqlalchemy import func
+from datetime import datetime
 
 class DatabaseManager:
     @staticmethod
@@ -75,6 +76,9 @@ class DatabaseManager:
     @staticmethod
     def create_topic(forum_id, name):
         """Create a new topic in a forum"""
+        # Ensure forum_id is not None
+        if forum_id is None:
+            raise ValueError("ID_форума не может быть None")
         topic = Topic(ID_форума=forum_id, название=name)
         db.session.add(topic)
         db.session.commit()
@@ -83,6 +87,9 @@ class DatabaseManager:
     @staticmethod
     def create_post(topic_id, user_id, content):
         """Create a new post in a topic"""
+        # Ensure topic_id and user_id are not None
+        if topic_id is None or user_id is None:
+            raise ValueError("ID_темы и ID_пользователя не могут быть None")
         post = Post(ID_темы=topic_id, ID_пользователя=user_id, содержимое=content)
         db.session.add(post)
         db.session.commit()
@@ -106,6 +113,9 @@ class DatabaseManager:
     @staticmethod
     def create_comment(post_id, user_id, content):
         """Create a new comment on a post"""
+        # Ensure post_id and user_id are not None
+        if post_id is None or user_id is None:
+            raise ValueError("ID_поста и ID_пользователя не могут быть None")
         comment = Comment(ID_поста=post_id, ID_пользователя=user_id, содержимое=content)
         db.session.add(comment)
         db.session.commit()
@@ -129,6 +139,9 @@ class DatabaseManager:
     @staticmethod
     def rate_post(post_id, rating, comment=None):
         """Rate a post"""
+        # Ensure post_id is not None
+        if post_id is None:
+            raise ValueError("ID_поста не может быть None")
         post_rating = Rating(ID_поста=post_id, оценка=rating, комментарий=comment)
         db.session.add(post_rating)
         db.session.commit()
@@ -173,3 +186,14 @@ class DatabaseManager:
         ).order_by(
             (func.count(Post.ID_поста) + func.count(Comment.ID_комментария)).desc()
         ).limit(limit).all() 
+        
+    @staticmethod
+    def create_profile(user_id, status, date=None):
+        """Create a new user profile"""
+        # Ensure user_id is not None
+        if user_id is None:
+            raise ValueError("ID_пользователя не может быть None")
+        profile = Profile(ID_пользователя=user_id, статус=status, дата_регистрации=date or datetime.utcnow())
+        db.session.add(profile)
+        db.session.commit()
+        return profile

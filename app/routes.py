@@ -22,6 +22,24 @@ def forum(forum_id):
     topics = DatabaseManager.get_topics(forum_id)
     return render_template('forum.html', forum=forum, topics=topics)
 
+@main_bp.route('/create_topic/<int:forum_id>', methods=['GET', 'POST'])
+def create_topic(forum_id):
+    """Create a new topic in a forum"""
+    if request.method == 'POST':
+        name = request.form.get('name')
+        forum_id = request.form.get('forum_id', forum_id)
+        
+        if name and forum_id:
+            try:
+                # Pass explicit forum_id to avoid None values
+                DatabaseManager.create_topic(forum_id=int(forum_id), name=name)
+                return redirect(url_for('main.forum', forum_id=forum_id))
+            except ValueError as e:
+                flash(str(e), 'danger')
+    
+    forum = DatabaseManager.get_forum(forum_id)
+    return render_template('create_topic.html', forum=forum)
+
 @main_bp.route('/topic/<int:topic_id>')
 def topic(topic_id):
     """Show posts in a topic"""
@@ -33,19 +51,26 @@ def topic(topic_id):
 def post(post_id):
     """Show a post and its comments"""
     post_data, comments = DatabaseManager.get_post_with_comments(post_id)
-    return render_template('post.html', post=post_data, comments=comments)
+    return render_template('post.html', post=post_data, comments=comments, DEFAULT_USER_ID=DEFAULT_USER_ID)
 
 @main_bp.route('/create_post/<int:topic_id>', methods=['GET', 'POST'])
 def create_post(topic_id):
     """Create a new post in a topic"""
     if request.method == 'POST':
         content = request.form.get('content')
-        if content:
-            DatabaseManager.create_post(topic_id, DEFAULT_USER_ID, content)
-            return redirect(url_for('main.topic', topic_id=topic_id))
+        topic_id = request.form.get('topic_id', topic_id)
+        user_id = request.form.get('user_id', DEFAULT_USER_ID)
+        
+        if content and topic_id:
+            try:
+                # Pass explicit IDs to avoid None values
+                DatabaseManager.create_post(topic_id=int(topic_id), user_id=int(user_id), content=content)
+                return redirect(url_for('main.topic', topic_id=topic_id))
+            except ValueError as e:
+                flash(str(e), 'danger')
     
     topic = DatabaseManager.get_topic(topic_id)
-    return render_template('create_post.html', topic=topic)
+    return render_template('create_post.html', topic=topic, DEFAULT_USER_ID=DEFAULT_USER_ID)
 
 @main_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
@@ -72,8 +97,15 @@ def delete_post(post_id):
 def create_comment(post_id):
     """Create a new comment on a post"""
     content = request.form.get('content')
-    if content:
-        DatabaseManager.create_comment(post_id, DEFAULT_USER_ID, content)
+    post_id = request.form.get('post_id', post_id)
+    user_id = request.form.get('user_id', DEFAULT_USER_ID)
+    
+    if content and post_id:
+        try:
+            # Pass explicit IDs to avoid None values
+            DatabaseManager.create_comment(post_id=int(post_id), user_id=int(user_id), content=content)
+        except ValueError as e:
+            flash(str(e), 'danger')
     return redirect(url_for('main.post', post_id=post_id))
 
 @main_bp.route('/rate_post/<int:post_id>', methods=['POST'])
@@ -81,8 +113,14 @@ def rate_post(post_id):
     """Rate a post"""
     rating = request.form.get('rating')
     comment = request.form.get('comment')
-    if rating:
-        DatabaseManager.rate_post(post_id, int(rating), comment)
+    post_id = request.form.get('post_id', post_id)
+    
+    if rating and post_id:
+        try:
+            # Pass explicit post_id to avoid None values
+            DatabaseManager.rate_post(post_id=int(post_id), rating=int(rating), comment=comment)
+        except ValueError as e:
+            flash(str(e), 'danger')
     return redirect(url_for('main.post', post_id=post_id))
 
 # Базовые аналитические маршруты
@@ -123,3 +161,22 @@ def category_statistics():
     """Show category statistics"""
     categories = AnalyticsManager.get_category_statistics()
     return render_template('analytics/category_statistics.html', categories=categories) 
+
+@main_bp.route('/create_profile', methods=['GET', 'POST'])
+def create_profile():
+    """Create a user profile"""
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        status = request.form.get('status', 'Активен')
+        
+        if user_id:
+            try:
+                # Convert user_id to integer and pass it explicitly
+                DatabaseManager.create_profile(user_id=int(user_id), status=status)
+                return redirect(url_for('main.index'))
+            except ValueError as e:
+                flash(str(e), 'danger')
+    
+    # Get all users that don't have profiles yet
+    users = User.query.outerjoin(Profile).filter(Profile.ID_пользователя == None).all()
+    return render_template('create_profile.html', users=users)

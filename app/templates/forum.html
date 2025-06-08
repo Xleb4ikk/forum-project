@@ -12,6 +12,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ forum.название }}</h1>
+    <a href="{{ url_for('main.create_topic', forum_id=forum.ID_форума) }}" class="btn btn-primary">Создать тему</a>
 </div>
 
 <p class="lead">{{ forum.описание }}</p>
