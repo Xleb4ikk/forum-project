@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика категорий - Аналитика{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Статистика по категориям</h1>
+
+{% if categories %}
+<div class="card">
+    <div class="card-header">
+        <h5>Распределение контента по категориям</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="categoryChart" height="300"></canvas>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h5>Детальная информация</h5>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Категория</th>
+                    <th>Количество форумов</th>
+                    <th>Количество тем</th>
+                    <th>Количество постов</th>
+                    <th>Доля контента (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set total_posts = namespace(value=0) %}
+                {% for category, forum_count, topic_count, post_count in categories %}
+                    {% set total_posts.value = total_posts.value + post_count %}
+                {% endfor %}
+                
+                {% for category, forum_count, topic_count, post_count in categories %}
+                <tr>
+                    <td>{{ category.название }}</td>
+                    <td>{{ forum_count }}</td>
+                    <td>{{ topic_count }}</td>
+                    <td>{{ post_count }}</td>
+                    <td>
+                        {% if total_posts.value > 0 %}
+                            {{ ((post_count / total_posts.value) * 100)|round(2) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>Нет данных о категориях.</p>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if categories %}
+        // Подготовка данных для графика
+        const labels = [];
+        const forumData = [];
+        const topicData = [];
+        const postData = [];
+        
+        {% for category, forum_count, topic_count, post_count in categories %}
+            labels.push("{{ category.название }}");
+            forumData.push({{ forum_count }});
+            topicData.push({{ topic_count }});
+            postData.push({{ post_count }});
+        {% endfor %}
+        
+        // Создание графика
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Форумы',
+                        data: forumData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Темы',
+                        data: topicData,
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Посты',
+                        data: postData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %} 

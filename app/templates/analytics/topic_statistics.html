@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика тем - Аналитика{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Статистика тем форума</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Фильтр</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.topic_statistics') }}" method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="limit" class="form-label">Количество результатов</label>
+                <input type="number" class="form-control" id="limit" name="limit" value="{{ limit }}" min="1" max="100">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Применить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if topics %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Тема</th>
+                <th>Форум</th>
+                <th>Постов</th>
+                <th>Комментариев</th>
+                <th>Средняя оценка</th>
+                <th>Первый пост</th>
+                <th>Последний пост</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for topic, forum_name, post_count, comment_count, avg_rating, first_post_date, last_post_date in topics %}
+            <tr>
+                <td>{{ topic.название }}</td>
+                <td>{{ forum_name }}</td>
+                <td>{{ post_count }}</td>
+                <td>{{ comment_count }}</td>
+                <td>{{ avg_rating|round(2) if avg_rating else '-' }}</td>
+                <td>{{ first_post_date.strftime('%d.%m.%Y') if first_post_date else '-' }}</td>
+                <td>{{ last_post_date.strftime('%d.%m.%Y') if last_post_date else '-' }}</td>
+                <td>
+                    <a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}" class="btn btn-sm btn-info">Просмотр</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>Нет данных о темах.</p>
+</div>
+{% endif %}
+{% endblock %} 

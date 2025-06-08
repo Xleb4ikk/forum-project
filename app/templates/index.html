@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Форум{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Добро пожаловать на форум!</h1>
+    <p class="lead">Выберите раздел, который вас интересует</p>
+</div>
+
+<div class="row mt-4">
+    {% for forum in forums %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ forum.название }}</h5>
+                <p class="card-text">{{ forum.описание }}</p>
+                <a href="{{ url_for('main.forum', forum_id=forum.ID_форума) }}" class="btn btn-primary">Перейти к форуму</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

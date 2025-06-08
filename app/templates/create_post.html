@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Новый пост - {{ topic.название }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.forum', forum_id=topic.ID_форума) }}">{{ topic.forum.название }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}">{{ topic.название }}</a></li>
+        <li class="breadcrumb-item active">Новый пост</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Создать новый пост</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Тема: {{ topic.название }}</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" method="post">
+            <div class="mb-3">
+                <label for="content" class="form-label">Содержимое поста</label>
+                <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Опубликовать</button>
+                <a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Активность по времени - Аналитика{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Активность пользователей по времени</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Фильтр</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.time_activity') }}" method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="days" class="form-label">Период (дней)</label>
+                <input type="number" class="form-control" id="days" name="days" value="{{ days }}" min="1" max="365">
+            </div>
+            <div class="col-md-4">
+                <label for="interval" class="form-label">Интервал</label>
+                <select class="form-select" id="interval" name="interval">
+                    <option value="hour" {% if interval == 'hour' %}selected{% endif %}>По часам</option>
+                    <option value="day" {% if interval == 'day' %}selected{% endif %}>По дням</option>
+                    <option value="month" {% if interval == 'month' %}selected{% endif %}>По месяцам</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Применить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if activity %}
+<div class="card">
+    <div class="card-header">
+        <h5>Результаты</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="activityChart" height="300"></canvas>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h5>Сводная таблица</h5>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Период</th>
+                    <th>Тип активности</th>
+                    <th>Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for period, count, activity_type in activity %}
+                <tr>
+                    <td>{{ period }}</td>
+                    <td>{% if activity_type == 'post' %}Посты{% else %}Комментарии{% endif %}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>Нет данных об активности за выбранный период.</p>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if activity %}
+        // Подготовка данных для графика
+        const periods = [];
+        const postCounts = [];
+        const commentCounts = [];
+        
+        {% for period, count, activity_type in activity %}
+            {% if activity_type == 'post' %}
+                periods.push("{{ period }}");
+                postCounts.push({{ count }});
+            {% else %}
+                commentCounts.push({{ count }});
+            {% endif %}
+        {% endfor %}
+        
+        // Создание графика
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: periods,
+                datasets: [
+                    {
+                        label: 'Посты',
+                        data: postCounts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Комментарии',
+                        data: commentCounts,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %} 

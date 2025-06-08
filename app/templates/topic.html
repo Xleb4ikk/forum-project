@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.название }} - Форум{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.forum', forum_id=topic.ID_форума) }}">{{ topic.forum.название }}</a></li>
+        <li class="breadcrumb-item active">{{ topic.название }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>{{ topic.название }}</h1>
+    <a href="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" class="btn btn-primary">Новый пост</a>
+</div>
+
+{% if posts %}
+<div class="mt-4">
+    {% for post, author_name in posts %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between">
+            <span>Автор: {{ author_name }}</span>
+            <span>{{ post.дата_публикации.strftime('%d.%m.%Y %H:%M') }}</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text post-content">{{ post.содержимое }}</p>
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('main.post', post_id=post.ID_поста) }}" class="btn btn-sm btn-info">Подробнее</a>
+            <a href="{{ url_for('main.edit_post', post_id=post.ID_поста) }}" class="btn btn-sm btn-warning">Редактировать</a>
+            <form action="{{ url_for('main.delete_post', post_id=post.ID_поста) }}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот пост?')">Удалить</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info mt-4">
+    <p>В этой теме пока нет постов. Создайте первый!</p>
+</div>
+{% endif %}
+{% endblock %} 

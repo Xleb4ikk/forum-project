@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать пост{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.forum', forum_id=post.topic.ID_форума) }}">{{ post.topic.forum.название }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.topic', topic_id=post.ID_темы) }}">{{ post.topic.название }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('main.post', post_id=post.ID_поста) }}">Пост</a></li>
+        <li class="breadcrumb-item active">Редактирование</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Редактировать пост</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Тема: {{ post.topic.название }}</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.edit_post', post_id=post.ID_поста) }}" method="post">
+            <div class="mb-3">
+                <label for="content" class="form-label">Содержимое поста</label>
+                <textarea class="form-control" id="content" name="content" rows="8" required>{{ post.содержимое }}</textarea>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a href="{{ url_for('main.post', post_id=post.ID_поста) }}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,14 @@
+{% extends 'admin/base.html' %}
+
+{% block access_control %}
+<div class="navbar-text btn-group pull-right">
+    <a href="{{ url_for('main.index') }}" class="btn btn-default">
+        <i class="glyphicon glyphicon-home"></i> На главную
+    </a>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('admin_routes.logout') }}" class="btn btn-default">
+        <i class="glyphicon glyphicon-log-out"></i> Выйти ({{ current_user.username }})
+    </a>
+    {% endif %}
+</div>
+{% endblock %} 
