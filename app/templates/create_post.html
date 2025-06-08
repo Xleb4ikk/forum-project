@@ -21,11 +21,22 @@
     <div class="card-body">
         <form action="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" method="post">
             <input type="hidden" name="topic_id" value="{{ topic.ID_темы }}">
-            <input type="hidden" name="user_id" value="{{ DEFAULT_USER_ID }}">
+
+            <div class="mb-3">
+                <label for="user_id" class="form-label">Пользователь</label>
+                <select class="form-select" id="user_id" name="user_id" required>
+                    <option value="">Выберите пользователя</option>
+                    {% for user in users %}
+                        <option value="{{ user.ID_пользователя }}">{{ user.имя_пользователя }} ({{ user.электронная_почта }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <div class="mb-3">
                 <label for="content" class="form-label">Содержимое поста</label>
                 <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
             </div>
+
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">Опубликовать</button>
                 <a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}" class="btn btn-secondary">Отмена</a>
@@ -33,4 +44,4 @@
         </form>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.database import DatabaseManager
 from app.analytics import AnalyticsManager
-from app.models.db_models import db, User
+from app.models.db_models import db, User, Profile
 
 # Create a blueprint
 main_bp = Blueprint('main', __name__)
@@ -56,21 +56,21 @@ def post(post_id):
 @main_bp.route('/create_post/<int:topic_id>', methods=['GET', 'POST'])
 def create_post(topic_id):
     """Create a new post in a topic"""
+    topic = DatabaseManager.get_topic(topic_id)
+    users = User.query.all()  # Загружаем всех пользователей
+
     if request.method == 'POST':
         content = request.form.get('content')
-        topic_id = request.form.get('topic_id', topic_id)
-        user_id = request.form.get('user_id', DEFAULT_USER_ID)
-        
-        if content and topic_id:
+        user_id = request.form.get('user_id')
+
+        if content and user_id:
             try:
-                # Pass explicit IDs to avoid None values
-                DatabaseManager.create_post(topic_id=int(topic_id), user_id=int(user_id), content=content)
+                DatabaseManager.create_post(topic_id=topic_id, user_id=int(user_id), content=content)
                 return redirect(url_for('main.topic', topic_id=topic_id))
             except ValueError as e:
                 flash(str(e), 'danger')
-    
-    topic = DatabaseManager.get_topic(topic_id)
-    return render_template('create_post.html', topic=topic, DEFAULT_USER_ID=DEFAULT_USER_ID)
+
+    return render_template('create_post.html', topic=topic, users=users)
 
 @main_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
@@ -165,9 +165,12 @@ def category_statistics():
 @main_bp.route('/create_profile', methods=['GET', 'POST'])
 def create_profile():
     """Create a user profile"""
+    
     if request.method == 'POST':
         user_id = request.form.get('user_id')
         status = request.form.get('status', 'Активен')
+
+        flash(f"DEBUG: user_id = {user_id}, status = {status}", 'info')
         
         if user_id:
             try:
@@ -176,7 +179,7 @@ def create_profile():
                 return redirect(url_for('main.index'))
             except ValueError as e:
                 flash(str(e), 'danger')
-    
+
     # Get all users that don't have profiles yet
     users = User.query.outerjoin(Profile).filter(Profile.ID_пользователя == None).all()
     return render_template('create_profile.html', users=users)
