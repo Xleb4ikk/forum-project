@@ -14,9 +14,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" method="post">
-            <input type="hidden" name="topic_id" value="{{ topic.ID_темы }}">
-
+        <form action="{{ url_for('main.create_profile') }}" method="post">
             <div class="mb-3">
                 <label for="user_id" class="form-label">Выберите пользователя</label>
                 <select class="form-select" id="user_id" name="user_id" required>
@@ -28,13 +26,13 @@
             </div>
 
             <div class="mb-3">
-                <label for="content" class="form-label">Содержимое поста</label>
-                <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
+                <label for="status" class="form-label">Статус</label>
+                <input type="text" class="form-control" id="status" name="status" value="Активен">
             </div>
 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Опубликовать</button>
-                <a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}" class="btn btn-secondary">Отмена</a>
+                <button type="submit" class="btn btn-primary">Создать профиль</button>
+                <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
     </div>

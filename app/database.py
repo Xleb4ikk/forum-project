@@ -107,7 +107,36 @@ class DatabaseManager:
     def delete_post(post_id):
         """Delete a post"""
         post = Post.query.get_or_404(post_id)
+        
+        # Сначала удаляем связанные записи
+        # Удаляем все рейтинги
+        Rating.query.filter_by(ID_поста=post_id).delete()
+        
+        # Удаляем все комментарии
+        Comment.query.filter_by(ID_поста=post_id).delete()
+        
+        # Теперь удаляем сам пост
         db.session.delete(post)
+        db.session.commit()
+    
+    @staticmethod
+    def delete_topic(topic_id):
+        """Delete a topic and all its posts"""
+        topic = Topic.query.get_or_404(topic_id)
+        
+        # Get all posts in this topic
+        posts = Post.query.filter_by(ID_темы=topic_id).all()
+        
+        # Delete all comments and ratings for each post
+        for post in posts:
+            Comment.query.filter_by(ID_поста=post.ID_поста).delete()
+            Rating.query.filter_by(ID_поста=post.ID_поста).delete()
+        
+        # Delete all posts
+        Post.query.filter_by(ID_темы=topic_id).delete()
+        
+        # Delete the topic
+        db.session.delete(topic)
         db.session.commit()
     
     @staticmethod

@@ -40,6 +40,15 @@ def create_topic(forum_id):
     forum = DatabaseManager.get_forum(forum_id)
     return render_template('create_topic.html', forum=forum)
 
+@main_bp.route('/delete_topic/<int:topic_id>', methods=['POST'])
+def delete_topic(topic_id):
+    """Delete a topic"""
+    topic = DatabaseManager.get_topic(topic_id)
+    forum_id = topic.ID_форума
+    DatabaseManager.delete_topic(topic_id)
+    flash('Тема успешно удалена', 'success')
+    return redirect(url_for('main.forum', forum_id=forum_id))
+
 @main_bp.route('/topic/<int:topic_id>')
 def topic(topic_id):
     """Show posts in a topic"""
@@ -61,7 +70,8 @@ def create_post(topic_id):
 
     if request.method == 'POST':
         content = request.form.get('content')
-        user_id = request.form.get('user_id')
+        direct_user_id = request.form.get('direct_user_id')
+        user_id = direct_user_id if direct_user_id else request.form.get('user_id')
 
         if content and user_id:
             try:

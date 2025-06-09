@@ -1,30 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Новый пост - {{ topic.название }}{% endblock %}
+{% block title %}НОВЫЙ ШАБЛОН - {{ topic.название }}{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('main.forum', forum_id=topic.ID_форума) }}">{{ topic.forum.название }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}">{{ topic.название }}</a></li>
-        <li class="breadcrumb-item active">Новый пост</li>
-    </ol>
-</nav>
-
-<h1 class="mb-4">Создать новый пост</h1>
 
 <div class="card">
-    <div class="card-header">
-        <h5>Тема: {{ topic.название }}</h5>
+    <div class="card-header bg-danger text-white">
     </div>
     <div class="card-body">
         <form action="{{ url_for('main.create_post', topic_id=topic.ID_темы) }}" method="post">
             <input type="hidden" name="topic_id" value="{{ topic.ID_темы }}">
 
             <div class="mb-3">
-                <label for="user_id" class="form-label">Пользователь</label>
-                <select class="form-select" id="user_id" name="user_id" required>
+                <label for="user_id" class="form-label">Выбор пользователя из списка:</label>
+                <select class="form-select" id="user_id" name="user_id">
                     <option value="">Выберите пользователя</option>
                     {% for user in users %}
                         <option value="{{ user.ID_пользователя }}">{{ user.имя_пользователя }} ({{ user.электронная_почта }})</option>
@@ -32,13 +21,18 @@
                 </select>
             </div>
 
+            <div class="mb-3 bg-warning p-4 rounded">
+                <h3>Ввод ID пользователя напрямую:</h3>
+                <input type="number" class="form-control form-control-lg" id="direct_user_id" name="direct_user_id" min="1" placeholder="Введите ID пользователя">
+            </div>
+
             <div class="mb-3">
-                <label for="content" class="form-label">Содержимое поста</label>
+                <label for="content" class="form-label">Содержимое поста:</label>
                 <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
             </div>
 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Опубликовать</button>
+                <button type="submit" class="btn btn-danger btn-lg">Опубликовать</button>
                 <a href="{{ url_for('main.topic', topic_id=topic.ID_темы) }}" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
